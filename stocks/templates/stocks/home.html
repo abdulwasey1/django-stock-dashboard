@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h1>Stock Dashboard</h1>
+
+    <!-- Dropdown to pick stock -->
+    <form method="get">
+        <label>Select Stock:</label>
+        <select name="stock" onchange="this.form.submit()">
+            {% for stock in stocks_list %}
+                <option value="{{ stock }}" {% if stock == selected_stock %}selected{% endif %}>{{ stock }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <!-- Chart.js canvas -->
+    <canvas id="priceChart" width="1500" height="360"></canvas>
+
+    <script>
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [{
+                    label: '{{ selected_stock }} Price',
+                    data: {{ prices|safe }},
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { display: true, title: { display: true, text: 'Date' } },
+                    y: { display: true, title: { display: true, text: 'Price (USD)' } }
+                }
+            }
+        });
+    </script>
+
+    <!-- Financial metrics table -->
+    <h2>Financial Metrics</h2>
+    <table border="1" cellpadding="8">
+        {% for key, value in metrics.items %}
+            <tr>
+                <td><strong>{{ key }}</strong></td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
